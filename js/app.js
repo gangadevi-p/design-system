@@ -1041,6 +1041,12 @@
   document.addEventListener("click", function (e) {
     var t = e.target;
 
+    var backTrigger = t.closest("#back-trigger");
+    if (backTrigger) {
+      window.history.back();
+      return;
+    }
+
     var brand = t.closest(".brand");
     if (brand) {
       e.preventDefault();
