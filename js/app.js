@@ -47,6 +47,13 @@
     window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
   }
 
+  /* One filter control for every page: a single segmented bar. Pages keep their own hook class and data attribute. */
+  function filterBar(hook, label, attr, items, selected) {
+    return '<nav class="filter-bar ' + hook + '" aria-label="' + label + '">' + items.map(function (item) {
+      return '<button type="button" ' + attr + '="' + item.id + '" aria-pressed="' + (item.id === selected) + '">' + item.name + '</button>';
+    }).join("") + '</nav>';
+  }
+
   function setNavOpen(open) {
     document.documentElement.classList.toggle("is-nav-open", open);
     $("menu-trigger").setAttribute("aria-expanded", open ? "true" : "false");
@@ -302,11 +309,8 @@
       { id: "responsive", name: "Responsive", content: responsiveGroup },
       { id: "in-use", name: "In use", content: inUseGroup }
     ];
-    var html = '<nav class="typography-filters" aria-label="Typography filters">' +
-      '<button type="button" data-typography-filter="all" aria-pressed="' + (typographyFilter === "all") + '">All</button>' +
-      families.map(function (family) {
-        return '<button type="button" data-typography-filter="' + family.id + '" aria-pressed="' + (typographyFilter === family.id) + '">' + family.name + '</button>';
-      }).join("") + '</nav>' +
+    var html = filterBar("typography-filters", "Typography filters", "data-typography-filter",
+      [{ id: "all", name: "All" }].concat(families), typographyFilter) +
       families.map(function (family) {
         return '<div class="typography-family" data-typography-family="' + family.id + '">' + family.content + '</div>';
       }).join("");
@@ -457,11 +461,8 @@
       { id: "neutral", name: "Neutral", content: neutral },
       { id: "contrast", name: "Contrast", content: contrastGroup }
     ];
-    var html = '<nav class="color-filters" aria-label="Color filters">' +
-      '<button type="button" data-color-filter="all" aria-pressed="' + (colorFilter === "all") + '">All</button>' +
-      families.map(function (family) {
-        return '<button type="button" data-color-filter="' + family.id + '" aria-pressed="' + (colorFilter === family.id) + '">' + family.name + '</button>';
-      }).join("") + '</nav>' +
+    var html = filterBar("color-filters", "Color filters", "data-color-filter",
+      [{ id: "all", name: "All" }].concat(families), colorFilter) +
       families.map(function (family) {
         return '<div class="color-family" data-color-family="' + family.id + '">' + family.content + '</div>';
       }).join("");
@@ -594,13 +595,18 @@
     return row[1];
   }
 
+  /* Ten collections would be ten buttons; three groups plus Color read better. */
+  var VARIABLE_GROUPS = [
+    { id: "layout", name: "Layout", ids: ["spacing", "radius", "sizing", "border", "elevation", "opacity", "breakpoints"] },
+    { id: "motion", name: "Motion", ids: ["duration", "easing"] },
+    { id: "type", name: "Type", ids: ["type"] }
+  ];
+
   function renderVariables() {
-    var filters = [{ id: "all", name: "All" }, { id: "color", name: "Color" }].concat(D.VARIABLE_COLLECTIONS.map(function (c) {
-      return { id: c.id, name: c.name };
+    var filters = [{ id: "all", name: "All" }, { id: "color", name: "Color" }].concat(VARIABLE_GROUPS.map(function (g) {
+      return { id: g.id, name: g.name };
     }));
-    var html = '<nav class="variable-filters" aria-label="Variable filters">' + filters.map(function (filter) {
-      return '<button type="button" data-variable-filter="' + filter.id + '" aria-pressed="' + (filter.id === variableFilter) + '">' + filter.name + '</button>';
-    }).join("") + '</nav>';
+    var html = filterBar("variable-filters", "Variable filters", "data-variable-filter", filters, variableFilter);
     html += '<div class="variable-family" data-variable-family="color">' + group("Color", D.COLOR_VARIABLES.length + " variables",
       "Use these in designs — never a raw hex. Each is a reusable light-theme role.",
       '<div class="color-mode-switch btn-group" role="group" aria-label="Color mode">' +
@@ -620,8 +626,8 @@
         }).join("") +
       '</div>') + '</div>';
 
-    D.VARIABLE_COLLECTIONS.forEach(function (c) {
-      html += '<div class="variable-family" data-variable-family="' + c.id + '">' + group(c.name, c.rows.length + " variables", c.desc,
+    function variableCollection(c) {
+      return group(c.name, c.rows.length + " variables", c.desc,
         '<div class="variable-grid">' +
           c.rows.map(function (row) {
             return '<article class="card variable-card variable-card--token" data-name="' + key([c.name, row[0], row[2]]) + '">' +
@@ -630,7 +636,13 @@
               '<div class="var-use">' + row[2] + '</div>' +
             '</article>';
           }).join("") +
-        '</div>') + '</div>';
+        '</div>');
+    }
+
+    VARIABLE_GROUPS.forEach(function (g) {
+      html += '<div class="variable-family" data-variable-family="' + g.id + '">' +
+        D.VARIABLE_COLLECTIONS.filter(function (c) { return g.ids.indexOf(c.id) !== -1; }).map(variableCollection).join("") +
+        '</div>';
     });
 
     $("body-variables").innerHTML = html;
@@ -1050,11 +1062,8 @@
       { id: "overlays", name: "Surfaces & overlays", items: overlays }
     ];
     $("body-components").innerHTML =
-      '<nav class="component-jumps" aria-label="Component filters">' +
-      '<button type="button" data-component-filter="all" aria-pressed="true">All</button>' +
-      families.map(function (family) {
-        return '<button type="button" data-component-filter="' + family.id + '" aria-pressed="false">' + family.name + '</button>';
-      }).join("") + '</nav>' + families.map(function (family) {
+      filterBar("component-jumps", "Component filters", "data-component-filter",
+        [{ id: "all", name: "All" }].concat(families), "all") + families.map(function (family) {
         return '<section class="group component-family" id="components-' + family.id + '" aria-labelledby="heading-' + family.id + '">' +
           '<header class="group-head"><h2 class="group-title" id="heading-' + family.id + '" tabindex="-1">' + family.name + '</h2></header>' +
           '<div class="component-grid">' + family.items.join("") + '</div></section>';
