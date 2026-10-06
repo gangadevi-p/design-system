@@ -535,7 +535,11 @@
       gaps: '<i></i><i></i><i></i><i></i>',
       complexity: '<i></i><i></i><i></i>',
       response: '<i></i><i></i>',
-      peak: '<i></i><i></i><i></i><i></i>'
+      peak: '<i></i><i></i><i></i><i></i>',
+      similarity: '<i></i><i></i><i></i><i></i><i></i>',
+      standout: '<i></i><i></i><i></i><i></i><i></i>',
+      region: '<i></i><i></i><i></i>',
+      goal: '<i></i><i></i><i></i><i></i>'
     };
     return '<div class="law-diagram law-diagram--' + type + '">' + shapes[type] + '</div><span class="law-number">' + number + '</span>';
   }
@@ -545,19 +549,45 @@
       ["Start with the task", "Design around what people need to do, not the features available.", I.checkCircle],
       ["Make status visible", "Show progress, results, and changes as they happen.", I.info],
       ["Prevent mistakes", "Use clear constraints and sensible defaults before an error can occur.", I.alertCircle],
-      ["Support everyone", "Build for keyboard, screen readers, contrast, touch, and different contexts.", I.heart]
+      ["Support everyone", "Build for keyboard, screen readers, contrast, touch, and different contexts.", I.heart],
+      ["Design every state", "Plan empty, loading, error, and success states, not only the ideal one.", I.layers],
+      ["Reduce effort", "Cut steps, typing, and decisions. Remember what people have already told you.", I.copy],
+      ["Let people undo", "Make actions reversible so exploring feels safe. Confirm only what cannot be undone.", I.replay],
+      ["Write for clarity", "Use plain, specific words. Say what a control does and what happens next.", I.edit]
     ];
     var ui = [
       ["Create hierarchy", "Use size, weight, spacing, and contrast to show what matters first.", I.arrowRight],
       ["Be consistent", "Reuse patterns, labels, and component states so behaviour stays predictable.", I.check],
       ["Keep it focused", "Show only what supports the current task; reveal detail when it is needed.", I.search],
-      ["Design responsive", "Keep content readable and controls reachable across every screen size.", I.replay]
+      ["Design responsive", "Keep content readable and controls reachable across every screen size.", I.replay],
+      ["Use space with intent", "White space groups, separates, and lets content breathe. Spacing is a design tool.", I.grid],
+      ["Keep type readable", "Limit sizes and weights. Keep body text comfortable, with generous line height.", I.edit],
+      ["Reserve colour for meaning", "Use colour for action, status, and focus, not decoration.", I.sun],
+      ["Align to a grid", "A shared spacing and column system makes layouts feel ordered and easy to scan.", I.layers]
     ];
     var product = [
       ["Solve a real need", "Connect every experience to a clear customer problem and outcome.", I.plus],
       ["Make value clear", "People should understand what they gain before they commit.", I.info],
       ["Learn from use", "Measure behaviour, listen to feedback, and improve the next decision.", I.replay],
-      ["Build trust", "Use honest language, clear choices, and reliable behaviour at every step.", I.checkCircle]
+      ["Build trust", "Use honest language, clear choices, and reliable behaviour at every step.", I.checkCircle],
+      ["Define success", "Agree what good looks like before designing, so every decision can be judged against it.", I.check],
+      ["Ship small, learn fast", "Release in small steps so each decision is tested against real use.", I.arrowUpRight],
+      ["Align the team", "Share one problem statement so design, engineering, and business pull the same way.", I.layers],
+      ["Plan for scale", "Prefer reusable components and variables over one-off screens.", I.grid]
+    ];
+    var accessibility = [
+      ["Meet contrast", "Text needs at least 4.5:1 against its background; large text and UI parts need 3:1.", I.sun],
+      ["Don’t rely on colour alone", "Pair colour with an icon, label, or pattern so status survives colour blindness.", I.alertCircle],
+      ["Make targets touchable", "Give every control at least a 44 px touch target, with space between neighbours.", I.plus],
+      ["Show focus", "Keep a visible focus ring and a logical keyboard order on every interactive element.", I.search],
+      ["Respect motion preferences", "Keep animation short and optional. Reduce or remove it when people ask for less motion.", I.monitor]
+    ];
+    var workflow = [
+      ["Use variables, not raw values", "Reference colour, spacing, and type variables so a change in one place updates everywhere.", I.copy],
+      ["Name things clearly", "Name layers, components, and variants by purpose so anyone can find and reuse them.", I.edit],
+      ["Test with real content", "Try long names, empty states, and real data before calling a layout finished.", I.info],
+      ["Annotate for handoff", "Note behaviour, states, and edge cases so engineers do not have to guess.", I.arrowRight],
+      ["Document decisions", "Record why a choice was made so the team can build on it instead of reopening it.", I.bookmark]
     ];
     var laws = [
       ["Hick’s Law", "More choices take longer to decide. Prioritise and group options.", lawVisual("choices", "01")],
@@ -567,7 +597,11 @@
       ["Law of Proximity", "Items placed together are understood as related. Use spacing to show groups.", lawVisual("gaps", "05")],
       ["Tesler’s Law", "Every task has complexity. Move unavoidable complexity away from the user.", lawVisual("complexity", "06")],
       ["Doherty Threshold", "Fast feedback keeps people engaged. Aim for responses within about 400 ms.", lawVisual("response", "07")],
-      ["Peak-End Rule", "People remember the high point and ending. Design key moments and completion well.", lawVisual("peak", "08")]
+      ["Peak-End Rule", "People remember the high point and ending. Design key moments and completion well.", lawVisual("peak", "08")],
+      ["Law of Similarity", "Elements that look alike are seen as a group. Style related items the same way.", lawVisual("similarity", "09")],
+      ["Von Restorff Effect", "The item that differs is the one remembered. Use contrast sparingly for what matters most.", lawVisual("standout", "10")],
+      ["Law of Common Region", "Items inside a shared boundary read as one group. Use cards and containers to group content.", lawVisual("region", "11")],
+      ["Goal-Gradient Effect", "Effort rises as the goal gets closer. Show progress so people keep going.", lawVisual("goal", "12")]
     ];
     function principleGroup(title, list, isLaw) {
       return group(title, null, null, '<div class="principles-grid">' + list.map(function (item) { return principleCard(item[0], item[1], item[2], isLaw); }).join("") + '</div>');
@@ -576,6 +610,8 @@
       { id: "ux", name: "UX", content: principleGroup("UX", ux) },
       { id: "ui", name: "UI", content: principleGroup("UI", ui) },
       { id: "product", name: "Product", content: principleGroup("Product", product) },
+      { id: "accessibility", name: "Accessibility", content: principleGroup("Accessibility", accessibility) },
+      { id: "workflow", name: "Workflow", content: principleGroup("Workflow", workflow) },
       { id: "laws", name: "Laws", content: principleGroup("Laws", laws, true) }
     ]);
   }
