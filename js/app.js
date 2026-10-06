@@ -1255,7 +1255,9 @@
 
     var html = "";
     if (!saved.length && !customCategories.length) {
-      html = '<div class="saved-empty">' + I.bookmark +
+      html = '<div class="saved-bar"><nav class="filter-bar saved-filters" aria-label="Saved filters">' +
+        '<button type="button" data-saved-filter="all" aria-pressed="true">All · 0</button></nav></div>' +
+        '<div class="saved-empty">' + I.bookmark +
         '<strong>Nothing saved yet</strong>' +
         '<span>Found something worth keeping? Add it from <em>Save here</em> in the sidebar.</span>' +
         '<button class="btn btn--primary btn--sm" type="button" data-saved-add>' + I.plus + 'Save here</button></div>';
