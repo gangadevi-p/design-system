@@ -30,6 +30,17 @@
 
   function num(n) { return String(Math.round(n * 100) / 100); }
 
+  /* Distance to keep clear above scroll targets: only the mobile menu bar is sticky. */
+  function scrollOffset() {
+    var bar = document.querySelector(".menubar");
+    return bar && bar.offsetHeight ? bar.offsetHeight + 16 : 24;
+  }
+
+  function setNavOpen(open) {
+    document.documentElement.classList.toggle("is-nav-open", open);
+    $("menu-trigger").setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
   function closeSearch() {
     if (!searchInput) return;
     searchInput.closest(".search").classList.remove("is-open");
@@ -126,7 +137,8 @@
       return '<div class="nav-group"><span class="nav-label">' + g.name + '</span>' +
         g.items.map(function (s) {
           return '<button class="nav-link" type="button" data-section="' + s.id + '">' +
-            '<span>' + s.name + '</span></button>';
+            '<span>' + s.name + '</span>' +
+            (s.id === "saved" ? '<span class="nav-link-count" id="saved-count"></span>' : "") + '</button>';
         }).join("") + '</div>';
     }).join("");
   }
@@ -159,7 +171,7 @@
       });
       g.hidden = !any;
     });
-    page.querySelector(".empty").hidden = shown !== 0;
+    page.querySelector(".empty").hidden = shown !== 0 || total === 0;
   }
 
   function show(id) {
@@ -1037,9 +1049,409 @@
     document.querySelectorAll("[data-indeterminate]").forEach(function (el) { el.indeterminate = true; });
   }
 
+  /* ================= SAVED ================= */
+  var SAVE_KEY = "designSystemSaved";
+  var CATEGORY_KEY = "designSystemCategories";
+  var NEW_CATEGORY = "__new__";
+  var DEFAULT_CATEGORIES = ["Typography", "Design", "Inspiration", "Colour", "Component", "Other"];
+  var customCategories = [];
+  var saved = [];
+  var savedFilter = "all";
+  var lastCategory = DEFAULT_CATEGORIES[0];
+  var addingLinkTo = null;
+  var editingId = null;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function allCategories() { return DEFAULT_CATEGORIES.concat(customCategories); }
+
+  /* Existing category with the same name (ignoring case), so "portfolio" and "Portfolio" stay one tab. */
+  function findCategory(name) {
+    var lower = name.toLowerCase();
+    return allCategories().filter(function (c) { return c.toLowerCase() === lower; })[0] || null;
+  }
+
+  function addCategory(name) {
+    var existing = findCategory(name);
+    if (existing) return existing;
+    customCategories.push(name);
+    try { localStorage.setItem(CATEGORY_KEY, JSON.stringify(customCategories)); } catch (err) {}
+    return name;
+  }
+
+  /* "" for empty, an absolute http(s) URL otherwise, null if it isn't a usable web link. */
+  function normalizeLink(raw) {
+    var text = String(raw || "").trim();
+    if (!text) return "";
+    if (/\s/.test(text)) return null;
+    if (!/^https?:\/\//i.test(text)) {
+      /* Another scheme (javascript:, mailto:, ftp://…) is not a web link; "localhost:4321" is a host and port. */
+      if (/^[a-z][a-z0-9+.-]*:(?!\d)/i.test(text)) return null;
+      text = (/^localhost(?![\w.-])/i.test(text) ? "http://" : "https://") + text;
+    }
+    try {
+      var url = new URL(text);
+      var host = url.hostname;
+      return host.indexOf(".") !== -1 || host === "localhost" ? url.href : null;
+    } catch (err) { return null; }
+  }
+
+  function linkLabel(href) {
+    var url = new URL(href);
+    return (url.host + url.pathname + url.search).replace(/\/$/, "");
+  }
+
+  function loadSaved() {
+    var list = [];
+    try {
+      var cats = JSON.parse(localStorage.getItem(CATEGORY_KEY) || "[]");
+      if (Array.isArray(cats)) {
+        cats.forEach(function (c) { if (typeof c === "string" && c.trim() && !findCategory(c.trim())) customCategories.push(c.trim()); });
+      }
+      list = JSON.parse(localStorage.getItem(SAVE_KEY) || "[]");
+    } catch (err) { list = []; }
+    saved = Array.isArray(list) ? list.filter(function (it) {
+      return it && typeof it.id === "string" && typeof it.title === "string" && typeof it.category === "string" && it.category;
+    }) : [];
+    saved.forEach(function (it) {
+      it.category = addCategory(it.category);
+      var links = (Array.isArray(it.links) ? it.links : []).concat(it.link ? [it.link] : []);
+      it.links = [];
+      links.forEach(function (href) {
+        var clean = normalizeLink(href);
+        if (clean && it.links.indexOf(clean) === -1) it.links.push(clean);
+      });
+      delete it.link;
+    });
+
+    /* One-time cleanup: a note that is just a localhost address was a test leftover, so empty it. */
+    var cleaned = false;
+    saved.forEach(function (it) {
+      if (typeof it.note === "string" && /^\s*(https?:\/\/)?localhost(:\d+)?\/?\s*$/i.test(it.note)) {
+        it.note = "";
+        cleaned = true;
+      }
+    });
+    if (cleaned) persistSaved();
+  }
+
+  function persistSaved() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(saved)); } catch (err) {}
+  }
+
+  function renderSaveForm(selected) {
+    var current = selected || lastCategory;
+    if (!findCategory(current)) current = DEFAULT_CATEGORIES[0];
+    $("save-category").innerHTML = allCategories().map(function (c) {
+      return '<option value="' + esc(c) + '"' + (c === current ? " selected" : "") + '>' + esc(c) + '</option>';
+    }).join("") + '<option value="' + NEW_CATEGORY + '">+ New category…</option>';
+    syncNewCategoryField();
+  }
+
+  function syncNewCategoryField() {
+    var isNew = $("save-category").value === NEW_CATEGORY;
+    $("save-new-field").hidden = !isNew;
+    $("save-new").required = isNew;
+    if (!isNew) clearFieldError("save-new");
+  }
+
+  function clearFieldError(inputId) {
+    var input = $(inputId);
+    input.closest(".field").classList.remove("is-error");
+    var help = $(inputId + "-help");
+    if (help) help.hidden = true;
+    input.removeAttribute("aria-invalid");
+  }
+
+  function setFieldError(inputId) {
+    var input = $(inputId);
+    input.closest(".field").classList.add("is-error");
+    $(inputId + "-help").hidden = false;
+    input.setAttribute("aria-invalid", "true");
+    input.focus();
+  }
+
+  function updateSavedCount() {
+    var el = $("saved-count");
+    if (el) { el.textContent = saved.length ? String(saved.length) : ""; }
+  }
+
+  function countIn(category) {
+    return saved.filter(function (it) { return it.category === category; }).length;
+  }
+
+  function renderSaved() {
+    /* Every category you created gets a tab, even while empty; built-in ones appear once they hold something. */
+    var tabs = allCategories().filter(function (c) {
+      return customCategories.indexOf(c) !== -1 || countIn(c) > 0;
+    });
+    if (savedFilter !== "all" && tabs.indexOf(savedFilter) === -1) { savedFilter = "all"; }
+    var list = saved.filter(function (it) { return savedFilter === "all" || it.category === savedFilter; });
+    var addLabel = savedFilter === "all" ? "Save here" : "Add to " + savedFilter;
+
+    var html = "";
+    if (!saved.length && !customCategories.length) {
+      html = '<div class="saved-empty">' + I.bookmark +
+        '<strong>Nothing saved yet</strong>' +
+        '<span>Found something worth keeping? Add it from <em>Save here</em> in the sidebar.</span>' +
+        '<button class="btn btn--primary btn--sm" type="button" data-saved-add>' + I.plus + 'Save here</button></div>';
+    } else {
+      html = '<div class="saved-bar"><nav class="saved-filters" aria-label="Saved filters">' +
+        ['all'].concat(tabs).map(function (f) {
+          var n = f === "all" ? saved.length : countIn(f);
+          return '<button type="button" data-saved-filter="' + esc(f) + '" aria-pressed="' + (f === savedFilter) + '">' +
+            (f === "all" ? "All" : esc(f)) + ' · ' + n + '</button>';
+        }).join("") + '</nav>' +
+        '<button class="btn btn--secondary btn--sm" type="button" data-saved-add>' + I.plus + esc(addLabel) + '</button></div>';
+      if (list.length) {
+        html += '<section class="group"><div class="saved-grid">' + list.map(function (it) {
+          var adding = it.id === addingLinkTo;
+          return '<article class="card saved-card" data-name="' + esc(key([it.title, it.category, it.links.join(" "), it.note || ""])) + '">' +
+            '<div class="saved-card-head"><span class="badge badge--accent">' + esc(it.category) + '</span>' +
+              '<div class="saved-card-actions">' +
+                '<button class="btn btn--ghost btn--icon btn--sm" type="button" data-saved-edit="' + esc(it.id) + '" aria-label="Edit ' + esc(it.title) + '">' + I.edit + '</button>' +
+                '<button class="btn btn--ghost btn--icon btn--sm" type="button" data-saved-addlink="' + esc(it.id) + '" aria-expanded="' + adding + '" aria-label="Add a link to ' + esc(it.title) + '">' + I.plus + '</button>' +
+                '<button class="btn btn--ghost btn--icon btn--sm" type="button" data-saved-delete="' + esc(it.id) + '" aria-label="Remove ' + esc(it.title) + '">' + I.trash + '</button>' +
+              '</div></div>' +
+            '<h3 class="saved-card-title">' + esc(it.title) + '</h3>' +
+            (it.note ? '<p class="saved-card-note">' + esc(it.note) + '</p>' : "") +
+            (it.links.length ? '<ul class="saved-links">' + it.links.map(function (href, i) {
+              return '<li><a class="saved-card-link" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer"><span>' + esc(linkLabel(href)) + '</span>' + I.arrowUpRight + '</a>' +
+                '<button class="saved-link-remove" type="button" data-saved-linkremove="' + esc(it.id) + '" data-index="' + i + '" aria-label="Remove link ' + esc(linkLabel(href)) + '">' + I.x + '</button></li>';
+            }).join("") + '</ul>' : "") +
+            (adding ? '<form class="saved-link-form" data-saved-linkform="' + esc(it.id) + '" novalidate>' +
+              '<div class="saved-link-row"><input class="input saved-link-input" type="text" inputmode="url" maxlength="500" placeholder="Paste a link, press Enter" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Link to add to ' + esc(it.title) + '. Press Enter to save." aria-describedby="saved-link-help"></div>' +
+              '<span class="field-help saved-link-help" id="saved-link-help" hidden></span></form>' : "") +
+            '<span class="saved-card-foot">' + new Date(it.savedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) + '</span>' +
+          '</article>';
+        }).join("") + '</div></section>';
+      } else {
+        html += '<div class="saved-empty">' + I.bookmark +
+          '<strong>' + (savedFilter === "all" ? "Nothing saved yet" : "Nothing in " + esc(savedFilter) + " yet") + '</strong>' +
+          '<span>Use <em>' + esc(addLabel) + '</em> to put the first one here.</span></div>';
+      }
+    }
+    $("body-saved").innerHTML = html;
+    updateSavedCount();
+  }
+
+  var toastTimer = null;
+
+  function showToast(html) {
+    var toast = $("toast");
+    toast.innerHTML = html;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 6000);
+  }
+
+  function hideToast() {
+    clearTimeout(toastTimer);
+    $("toast").hidden = true;
+  }
+
+  function resetSaveForm() {
+    $("save-form").reset();
+    clearFieldError("save-title");
+    clearFieldError("save-new");
+  }
+
+  /* `category` preselects a tab, e.g. when adding from inside Portfolio. Without it, the last category used. */
+  function openSaveDialog(category, item) {
+    var dialog = $("save-dialog");
+    if (dialog.open) return;
+    setNavOpen(false);
+    resetSaveForm();
+    editingId = item ? item.id : null;
+    $("save-dialog-title").textContent = item ? "Edit saved item" : "Save here";
+    $("save-submit").textContent = item ? "Save changes" : "Save";
+    renderSaveForm(item ? item.category : category);
+    if (item) {
+      $("save-title").value = item.title;
+      $("save-note").value = item.note || "";
+    }
+    dialog.showModal();
+    $("save-title").focus();
+    if (item) $("save-title").select();
+  }
+
+  function closeSaveDialog() {
+    var dialog = $("save-dialog");
+    if (dialog.open) dialog.close();
+  }
+
+  function submitSave() {
+    var title = $("save-title").value.trim();
+    var creating = $("save-category").value === NEW_CATEGORY;
+    var newName = creating ? $("save-new").value.trim().replace(/\s+/g, " ") : "";
+    /* Flag every problem; the last one flagged takes focus, so go bottom-up to land on the first in reading order. */
+    if (creating && !newName) setFieldError("save-new");
+    if (!title) setFieldError("save-title");
+    if (!title || (creating && !newName)) return;
+
+    var category = creating ? addCategory(newName) : $("save-category").value;
+    lastCategory = category;
+    var editing = editingId && saved.filter(function (it) { return it.id === editingId; })[0];
+    if (editing) {
+      editing.title = title;
+      editing.category = category;
+      editing.note = $("save-note").value.trim();
+      /* Keep the item in view: if its tab changed, follow it there. */
+      if (savedFilter !== "all") savedFilter = category;
+    } else {
+      saved.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        title: title,
+        category: category,
+        links: [],
+        note: $("save-note").value.trim(),
+        savedAt: new Date().toISOString()
+      });
+    }
+    editingId = null;
+    persistSaved();
+    renderSaved();
+    applyFilter();
+    closeSaveDialog();
+    showToast(I.check + '<span>' + (editing ? "Changes saved in " : "Saved to ") + esc(category) + '</span><button type="button" data-view-saved="' + esc(category) + '">View</button>');
+  }
+
   /* ================= EVENTS ================= */
+  function openLinkField(id) {
+    addingLinkTo = id;
+    renderSaved();
+    applyFilter();
+    var input = document.querySelector(".saved-link-input");
+    if (input) input.focus();
+  }
+
+  function closeLinkField(id) {
+    addingLinkTo = null;
+    renderSaved();
+    applyFilter();
+    var plus = document.querySelector('[data-saved-addlink="' + id + '"]');
+    if (plus) plus.focus();
+  }
+
+  function submitLink(form) {
+    var id = form.getAttribute("data-saved-linkform");
+    var input = form.querySelector(".saved-link-input");
+    var help = form.querySelector(".saved-link-help");
+    var link = normalizeLink(input.value);
+    if (!link) {
+      help.textContent = link === "" ? "Paste a link to save." : "Enter a valid web link, like https://example.com.";
+      help.hidden = false;
+      input.setAttribute("aria-invalid", "true");
+      input.focus();
+      return;
+    }
+    var item = saved.filter(function (it) { return it.id === id; })[0];
+    if (item && item.links.indexOf(link) === -1) {
+      item.links.push(link);
+      persistSaved();
+    }
+    closeLinkField(id);
+  }
+
+  document.addEventListener("submit", function (e) {
+    if (e.target.id === "save-form") { e.preventDefault(); submitSave(); return; }
+    if (e.target.hasAttribute("data-saved-linkform")) { e.preventDefault(); submitLink(e.target); }
+  });
+
+  document.addEventListener("input", function (e) {
+    if (e.target.id === "save-title" || e.target.id === "save-new") clearFieldError(e.target.id);
+    if (e.target.classList.contains("saved-link-input")) {
+      e.target.removeAttribute("aria-invalid");
+      e.target.closest("form").querySelector(".saved-link-help").hidden = true;
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && e.target.classList.contains("saved-link-input")) {
+      closeLinkField(addingLinkTo);
+    }
+  });
+
+  document.addEventListener("change", function (e) {
+    if (e.target.id !== "save-category") return;
+    syncNewCategoryField();
+    if (e.target.value === NEW_CATEGORY) $("save-new").focus();
+  });
+
   document.addEventListener("click", function (e) {
     var t = e.target;
+
+    if (t.closest("#save-open")) { openSaveDialog(); return; }
+    if (t.closest("#save-close") || t.closest("#save-cancel")) { closeSaveDialog(); return; }
+    if (t.id === "save-dialog") {
+      var box = t.getBoundingClientRect();
+      if (e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom) { closeSaveDialog(); }
+      return;
+    }
+
+    var viewSaved = t.closest("[data-view-saved]");
+    if (viewSaved) {
+      savedFilter = viewSaved.getAttribute("data-view-saved") || "all";
+      hideToast();
+      renderSaved();
+      show("saved");
+      setNavOpen(false);
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    if (t.closest("[data-saved-add]")) { openSaveDialog(savedFilter === "all" ? undefined : savedFilter); return; }
+
+    var savedFilterBtn = t.closest("[data-saved-filter]");
+    if (savedFilterBtn) {
+      savedFilter = savedFilterBtn.getAttribute("data-saved-filter");
+      renderSaved();
+      applyFilter();
+      return;
+    }
+
+    var editBtn = t.closest("[data-saved-edit]");
+    if (editBtn) {
+      var editItem = saved.filter(function (it) { return it.id === editBtn.getAttribute("data-saved-edit"); })[0];
+      if (editItem) openSaveDialog(undefined, editItem);
+      return;
+    }
+
+    var addLinkBtn = t.closest("[data-saved-addlink]");
+    if (addLinkBtn) {
+      var linkId = addLinkBtn.getAttribute("data-saved-addlink");
+      if (addingLinkTo === linkId) { closeLinkField(linkId); } else { openLinkField(linkId); }
+      return;
+    }
+
+    var linkRemove = t.closest("[data-saved-linkremove]");
+    if (linkRemove) {
+      var owner = saved.filter(function (it) { return it.id === linkRemove.getAttribute("data-saved-linkremove"); })[0];
+      if (owner) {
+        owner.links.splice(parseInt(linkRemove.getAttribute("data-index"), 10), 1);
+        persistSaved();
+        renderSaved();
+        applyFilter();
+      }
+      return;
+    }
+
+    var savedDelete = t.closest("[data-saved-delete]");
+    if (savedDelete) {
+      var id = savedDelete.getAttribute("data-saved-delete");
+      saved = saved.filter(function (it) { return it.id !== id; });
+      persistSaved();
+      renderSaved();
+      applyFilter();
+      return;
+    }
+
+    if (t.closest("#menu-trigger")) { setNavOpen(true); $("sidebar-close").focus(); return; }
+    if (t.closest("#sidebar-close") || t.closest("#scrim")) { setNavOpen(false); $("menu-trigger").focus(); return; }
 
     var backTrigger = t.closest("#back-trigger");
     if (backTrigger) {
@@ -1051,6 +1463,7 @@
     if (brand) {
       e.preventDefault();
       show("components");
+      setNavOpen(false);
       window.scrollTo(0, 0);
       return;
     }
@@ -1066,13 +1479,13 @@
     }
 
     var navLink = t.closest(".nav-link");
-    if (navLink) { show(navLink.getAttribute("data-section")); window.scrollTo(0, 0); return; }
+    if (navLink) { show(navLink.getAttribute("data-section")); setNavOpen(false); window.scrollTo(0, 0); return; }
 
     var typographyFilterBtn = t.closest("[data-typography-filter]");
     if (typographyFilterBtn) {
       typographyFilter = typographyFilterBtn.getAttribute("data-typography-filter");
       applyTypographyFilter();
-      window.scrollTo({ top: document.querySelector(".typography-filters").getBoundingClientRect().top + window.scrollY - 112, behavior: "smooth" });
+      window.scrollTo({ top: document.querySelector(".typography-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
       return;
     }
 
@@ -1080,7 +1493,7 @@
     if (colorFilterBtn) {
       colorFilter = colorFilterBtn.getAttribute("data-color-filter");
       applyColorFilter();
-      window.scrollTo({ top: document.querySelector(".color-filters").getBoundingClientRect().top + window.scrollY - 112, behavior: "smooth" });
+      window.scrollTo({ top: document.querySelector(".color-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
       return;
     }
 
@@ -1096,7 +1509,7 @@
     if (variableFilterBtn) {
       variableFilter = variableFilterBtn.getAttribute("data-variable-filter");
       applyVariableFilter();
-      window.scrollTo({ top: document.querySelector(".variable-filters").getBoundingClientRect().top + window.scrollY - 112, behavior: "smooth" });
+      window.scrollTo({ top: document.querySelector(".variable-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
       return;
     }
 
@@ -1110,7 +1523,7 @@
         family.hidden = filter !== "all" && family.id !== "components-" + filter;
       });
       if (searchInput) { searchInput.value = ""; applyFilter(); }
-      window.scrollTo({ top: document.querySelector(".component-jumps").getBoundingClientRect().top + window.scrollY - 112, behavior: "smooth" });
+      window.scrollTo({ top: document.querySelector(".component-jumps").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
       return;
     }
 
@@ -1169,6 +1582,17 @@
     }
   });
 
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && document.documentElement.classList.contains("is-nav-open")) {
+      setNavOpen(false);
+      $("menu-trigger").focus();
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 960) { setNavOpen(false); }
+  });
+
   window.addEventListener("hashchange", function () { show(location.hash.slice(1)); });
 
   /* ================= INIT ================= */
@@ -1179,8 +1603,10 @@
   } catch (err) {}
   if (saved.platform === "mobile") { platform = "mobile"; }
 
+  loadSaved();
   renderNav();
   renderPages();
+  renderSaved();
   renderTypography();
   renderColors();
   renderAnimations();

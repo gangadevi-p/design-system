@@ -11,6 +11,9 @@
       '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
   }
   var ICONS = {
+    edit: icon('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
+    arrowUpRight: icon('<path d="M7 17 17 7M8 7h9v9"/>'),
+    bookmark: icon('<path d="M7 4h10v16l-5-4-5 4z"/>'),
     plus: icon('<path d="M12 5v14M5 12h14"/>'),
     arrowRight: icon('<path d="M5 12h14M13 6l6 6-6 6"/>'),
     chevronDown: icon('<path d="M6 9l6 6 6-6"/>'),
@@ -51,7 +54,9 @@
     { id: "variables", group: "Sections", name: "Variables",
       intro: "Reusable tokens for light and dark, including motion." },
     { id: "principles", group: "Sections", name: "Principles",
-      intro: "UX, UI and design principles." }
+      intro: "UX, UI and design principles." },
+    { id: "saved", group: "Sections", name: "Saved",
+      intro: "Everything you saved from the sidebar." }
   ];
 
   /* ================= TYPOGRAPHY ================= */
