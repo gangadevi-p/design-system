@@ -6,18 +6,18 @@
    ============================================================ */
 
 :root{
-  /* ---------- palette: green action scale ---------- */
-  --accent-50:#f0fdf4;
-  --accent-100:#dcfce7;
-  --accent-200:#bbf7d0;
-  --accent-300:#86efac;
-  --accent-400:#4ade80;
-  --accent-500:#22c55e;
-  --accent-600:#16a34a;
-  --accent-700:#15803d;
-  --accent-800:#166534;
-  --accent-900:#14532d;
-  --accent-950:#052e16;
+  /* ---------- palette: monochrome action scale (black, white and grey only) ---------- */
+  --accent-50:#fafafa;
+  --accent-100:#f3f3f3;
+  --accent-200:#e5e5e5;
+  --accent-300:#d1d1d1;
+  --accent-400:#a3a3a3;
+  --accent-500:#737373;
+  --accent-600:#525252;
+  --accent-700:#404040;
+  --accent-800:#262626;
+  --accent-900:#171717;
+  --accent-950:#0a0a0a;
 
   /* ---------- palette: neutral grayscale ---------- */
   --neutral-0:#ffffff;
@@ -34,17 +34,17 @@
   --neutral-950:#0a0a0a;
   --neutral-1000:#000000;
 
-  /* ---------- status: distinct hues, reserved for meaning ---------- */
-  --success-600:#047857;
-  --success-400:#34d399;
-  --warning-600:#b45309;
-  --warning-400:#fbbf24;
-  --danger-800:#7f1d1d;
-  --danger-700:#991b1b;
-  --danger-600:#b91c1c;
-  --danger-400:#f87171;
-  --danger-300:#fca5a5;
-  --danger-200:#fecaca;
+  /* ---------- status: greys only, told apart by icon and label rather than hue ---------- */
+  --success-600:#404040;
+  --success-400:#d1d1d1;
+  --warning-600:#737373;
+  --warning-400:#a3a3a3;
+  --danger-800:#262626;
+  --danger-700:#404040;
+  --danger-600:#525252;
+  --danger-400:#a3a3a3;
+  --danger-300:#d1d1d1;
+  --danger-200:#e5e5e5;
 
   /* ---------- typeface ---------- */
   --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -161,22 +161,22 @@
   --border-strong:rgba(0,0,0,.24);
   --grid-line:rgba(0,0,0,.045);
 
-  --accent:var(--accent-700);
+  --accent:var(--accent-900);
   --accent-hover:var(--accent-800);
-  --accent-pressed:var(--accent-900);
-  --accent-tint:var(--accent-100);
-  --accent-tint-strong:var(--accent-200);
-  --accent-text:var(--accent-800);
-  --focus-ring:var(--accent-600);
+  --accent-pressed:var(--accent-950);
+  --accent-tint:var(--accent-200);
+  --accent-tint-strong:var(--accent-300);
+  --accent-text:var(--accent-900);
+  --focus-ring:var(--accent-900);
 
   --success:var(--success-600);
-  --success-tint:rgba(4,120,87,.12);
+  --success-tint:rgba(0,0,0,.08);
   --warning:var(--warning-600);
-  --warning-tint:rgba(180,83,9,.12);
+  --warning-tint:rgba(0,0,0,.08);
   --danger:var(--danger-600);
   --danger-hover:var(--danger-700);
   --danger-pressed:var(--danger-800);
-  --danger-tint:rgba(185,28,28,.10);
+  --danger-tint:rgba(0,0,0,.08);
   --on-danger:var(--neutral-0);
 
   --disabled-bg:var(--neutral-200);
@@ -217,22 +217,22 @@
     --border-strong:rgba(255,255,255,.22);
     --grid-line:rgba(255,255,255,.035);
 
-    --accent:var(--accent-400);
-    --accent-hover:var(--accent-300);
-    --accent-pressed:var(--accent-200);
-    --accent-tint:rgba(74,222,128,.16);
-    --accent-tint-strong:rgba(74,222,128,.28);
-    --accent-text:var(--accent-300);
+    --accent:var(--accent-100);
+    --accent-hover:var(--neutral-0);
+    --accent-pressed:var(--accent-300);
+    --accent-tint:rgba(255,255,255,.14);
+    --accent-tint-strong:rgba(255,255,255,.24);
+    --accent-text:var(--accent-100);
     --focus-ring:var(--accent-300);
 
     --success:var(--success-400);
-    --success-tint:rgba(52,211,153,.14);
+    --success-tint:rgba(255,255,255,.12);
     --warning:var(--warning-400);
-    --warning-tint:rgba(251,191,36,.16);
+    --warning-tint:rgba(255,255,255,.12);
     --danger:var(--danger-400);
     --danger-hover:var(--danger-300);
     --danger-pressed:var(--danger-200);
-    --danger-tint:rgba(248,113,113,.16);
+    --danger-tint:rgba(255,255,255,.12);
     --on-danger:var(--neutral-1000);
 
     --disabled-bg:var(--neutral-800);
@@ -270,22 +270,22 @@
   --border-strong:rgba(255,255,255,.22);
   --grid-line:rgba(255,255,255,.035);
 
-  --accent:var(--accent-400);
-  --accent-hover:var(--accent-300);
-  --accent-pressed:var(--accent-200);
-  --accent-tint:rgba(74,222,128,.16);
-  --accent-tint-strong:rgba(74,222,128,.28);
-  --accent-text:var(--accent-300);
+  --accent:var(--accent-100);
+  --accent-hover:var(--neutral-0);
+  --accent-pressed:var(--accent-300);
+  --accent-tint:rgba(255,255,255,.14);
+  --accent-tint-strong:rgba(255,255,255,.24);
+  --accent-text:var(--accent-100);
   --focus-ring:var(--accent-300);
 
   --success:var(--success-400);
-  --success-tint:rgba(52,211,153,.14);
+  --success-tint:rgba(255,255,255,.12);
   --warning:var(--warning-400);
-  --warning-tint:rgba(251,191,36,.16);
+  --warning-tint:rgba(255,255,255,.12);
   --danger:var(--danger-400);
   --danger-hover:var(--danger-300);
   --danger-pressed:var(--danger-200);
-  --danger-tint:rgba(248,113,113,.16);
+  --danger-tint:rgba(255,255,255,.12);
   --on-danger:var(--neutral-1000);
 
   --disabled-bg:var(--neutral-800);

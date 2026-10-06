@@ -48,7 +48,7 @@
     { id: "buttons", group: "Sections", name: "Buttons",
       intro: "Variants, states and sizes." },
     { id: "colors", group: "Sections", name: "Colors",
-      intro: "One green accent, a neutral scale, status colours and contrast." },
+      intro: "Black, white and grey only: a mono accent, a neutral scale, status tones and contrast." },
     { id: "typography", group: "Sections", name: "Typography",
       intro: "Type scale, weights and responsive sizes." },
     { id: "variables", group: "Sections", name: "Variables",
@@ -118,16 +118,16 @@
 
   /* ================= COLOURS ================= */
   var ACCENT = {
-    name: "Green",
-    light: { step: 700, name: "Green 700", hex: "#15803D" },
-    dark: { step: 400, name: "Green 400", hex: "#4ADE80" }
+    name: "Mono",
+    light: { step: 900, name: "Mono 900", hex: "#171717" },
+    dark: { step: 100, name: "Mono 100", hex: "#F3F3F3" }
   };
 
   var ACCENT_SCALE = [
-    { step: 50, name: "Green 50", hex: "#F0FDF4" }, { step: 100, name: "Green 100", hex: "#DCFCE7" }, { step: 200, name: "Green 200", hex: "#BBF7D0" },
-    { step: 300, name: "Green 300", hex: "#86EFAC" }, { step: 400, name: "Green 400", hex: "#4ADE80" }, { step: 500, name: "Green 500", hex: "#22C55E" },
-    { step: 600, name: "Green 600", hex: "#16A34A" }, { step: 700, name: "Green 700", hex: "#15803D" }, { step: 800, name: "Green 800", hex: "#166534" },
-    { step: 900, name: "Green 900", hex: "#14532D" }, { step: 950, name: "Green 950", hex: "#052E16" }
+    { step: 50, name: "Mono 50", hex: "#FAFAFA" }, { step: 100, name: "Mono 100", hex: "#F3F3F3" }, { step: 200, name: "Mono 200", hex: "#E5E5E5" },
+    { step: 300, name: "Mono 300", hex: "#D1D1D1" }, { step: 400, name: "Mono 400", hex: "#A3A3A3" }, { step: 500, name: "Mono 500", hex: "#737373" },
+    { step: 600, name: "Mono 600", hex: "#525252" }, { step: 700, name: "Mono 700", hex: "#404040" }, { step: 800, name: "Mono 800", hex: "#262626" },
+    { step: 900, name: "Mono 900", hex: "#171717" }, { step: 950, name: "Mono 950", hex: "#0A0A0A" }
   ];
 
   var NEUTRAL_SCALE = [
@@ -149,11 +149,11 @@
   ];
 
   var STATUS = [
-    { name: "Success", light: "#047857", dark: "#34D399", badge: "success", icon: "checkCircle",
-      use: "Completed actions, valid input, positive change. A different green from the accent so “done” never reads as “act on this”." },
-    { name: "Warning", light: "#B45309", dark: "#FBBF24", badge: "warning", icon: "alertTriangle",
+    { name: "Success", light: "#404040", dark: "#D1D1D1", badge: "success", icon: "checkCircle",
+      use: "Completed actions, valid input, positive change. Told apart by its icon and label, since the palette has no hue." },
+    { name: "Warning", light: "#737373", dark: "#A3A3A3", badge: "warning", icon: "alertTriangle",
       use: "Needs attention soon. Nothing is broken yet." },
-    { name: "Danger", light: "#B91C1C", dark: "#F87171", badge: "danger", icon: "alertCircle",
+    { name: "Danger", light: "#525252", dark: "#A3A3A3", badge: "danger", icon: "alertCircle",
       use: "Errors, failed states and destructive actions." }
   ];
 
@@ -170,17 +170,17 @@
     { name: "text/on-accent", light: ["White", "#FFFFFF"], dark: ["Black", "#000000"], use: "Text on accent fills" },
     { name: "border/default", light: ["Black · 12% opacity", "rgba(0,0,0,.12)"], dark: ["White · 10% opacity", "rgba(255,255,255,.10)"], use: "Card edges and dividers" },
     { name: "border/strong", light: ["Black · 24% opacity", "rgba(0,0,0,.24)"], dark: ["White · 22% opacity", "rgba(255,255,255,.22)"], use: "Input and button outlines" },
-    { name: "accent/default", light: ["Green 700", "#15803D"], dark: ["Green 400", "#4ADE80"], use: "The primary action" },
-    { name: "accent/hover", light: ["Green 800", "#166534"], dark: ["Green 300", "#86EFAC"], use: "Action while hovered" },
-    { name: "accent/pressed", light: ["Green 900", "#14532D"], dark: ["Green 200", "#BBF7D0"], use: "Action while pressed" },
-    { name: "accent/tint", light: ["Green 100", "#DCFCE7"], dark: ["Green 400 · 16% opacity", "rgba(74,222,128,.16)"], use: "Selected backgrounds" },
-    { name: "accent/tint-strong", light: ["Green 200", "#BBF7D0"], dark: ["Green 400 · 28% opacity", "rgba(74,222,128,.28)"], use: "Pressed selected backgrounds" },
-    { name: "accent/text", light: ["Green 800", "#166534"], dark: ["Green 300", "#86EFAC"], use: "Links and action labels" },
-    { name: "focus/ring", light: ["Green 600", "#16A34A"], dark: ["Green 300", "#86EFAC"], use: "Keyboard focus outline" },
-    { name: "status/success", light: ["Emerald", "#047857"], dark: ["Emerald light", "#34D399"], use: "Success text, icons and fills — kept apart from accent/default" },
-    { name: "status/warning", light: ["Amber", "#B45309"], dark: ["Amber light", "#FBBF24"], use: "Warning text, icons and fills" },
-    { name: "status/danger", light: ["Red", "#B91C1C"], dark: ["Red light", "#F87171"], use: "Error text, icons and danger buttons" },
-    { name: "status/danger-hover", light: ["Red dark", "#991B1B"], dark: ["Red pale", "#FCA5A5"], use: "Danger button while hovered" },
+    { name: "accent/default", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "The primary action" },
+    { name: "accent/hover", light: ["Mono 800", "#262626"], dark: ["White", "#FFFFFF"], use: "Action while hovered" },
+    { name: "accent/pressed", light: ["Mono 950", "#0A0A0A"], dark: ["Mono 300", "#D1D1D1"], use: "Action while pressed" },
+    { name: "accent/tint", light: ["Mono 200", "#E5E5E5"], dark: ["White · 14% opacity", "rgba(255,255,255,.14)"], use: "Selected backgrounds" },
+    { name: "accent/tint-strong", light: ["Mono 300", "#D1D1D1"], dark: ["White · 24% opacity", "rgba(255,255,255,.24)"], use: "Pressed selected backgrounds" },
+    { name: "accent/text", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "Links and action labels" },
+    { name: "focus/ring", light: ["Mono 900", "#171717"], dark: ["Mono 300", "#D1D1D1"], use: "Keyboard focus outline" },
+    { name: "status/success", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Success text, icons and fills — paired with a check icon" },
+    { name: "status/warning", light: ["Gray", "#737373"], dark: ["Mid gray", "#A3A3A3"], use: "Warning text, icons and fills — paired with a warning icon" },
+    { name: "status/danger", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Error text, icons and danger buttons" },
+    { name: "status/danger-hover", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Danger button while hovered" },
     { name: "state/disabled-bg", light: ["Light gray", "#E5E5E5"], dark: ["Deep charcoal", "#262626"], use: "Disabled fills" },
     { name: "state/disabled-text", light: ["Mid gray", "#A3A3A3"], dark: ["Dark gray", "#525252"], use: "Disabled text and icons" },
     { name: "inverse/surface", light: ["Ink", "#171717"], dark: ["Pale gray", "#F3F3F3"], use: "Toasts and tooltips" },

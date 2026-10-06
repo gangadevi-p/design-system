@@ -121,8 +121,8 @@
   function textOn(hex) {
     var c = parseColor(hex);
     var onWhite = contrast(c, parseColor("#FFFFFF"));
-    var onDark = contrast(c, parseColor("#0B0E12"));
-    return onWhite >= onDark ? { color: "#FFFFFF", ratio: onWhite } : { color: "#0B0E12", ratio: onDark };
+    var onDark = contrast(c, parseColor("#000000"));
+    return onWhite >= onDark ? { color: "#FFFFFF", ratio: onWhite } : { color: "#000000", ratio: onDark };
   }
 
   /* ================= SHELL ================= */
@@ -371,27 +371,27 @@
       '</div>');
 
     var accent = group("Accent", "1 colour", null,
-      '<article class="card accent-hero" data-name="accent green brand">' +
+      '<article class="card accent-hero" data-name="accent mono black white grey brand">' +
         '<div class="accent-hero-swatch">' +
           '<span class="accent-hero-name">' + A.name + '</span>' +
           '<span class="accent-hero-values">' + A.light.name + ' · ' + A.light.hex + '</span>' +
         '</div>' +
         '<div class="accent-hero-text">' +
           '<p class="eyebrow">One accent</p>' +
-          '<h3 class="doc-title">Green means “you can act on this”</h3>' +
-          '<p class="doc-text">It is the only action colour in the system. Everything else is neutral, so green points at an action, a selection or focus.</p>' +
+          '<h3 class="doc-title">Black means “you can act on this”</h3>' +
+          '<p class="doc-text">The whole system is black, white and grey. The strongest tone marks an action, a selection or focus, and everything else stays quieter.</p>' +
           '<ul class="rule-list">' +
             '<li class="yes">' + I.check + '<span>Buttons, links, checked controls, selected items, focus and progress.</span></li>' +
-            '<li class="yes">' + I.check + '<span>Green 700 is the default action colour; Green 400 in dark mode.</span></li>' +
+            '<li class="yes">' + I.check + '<span>Mono 900 is the default action colour; Mono 100 in dark mode.</span></li>' +
             '<li class="no">' + I.x + '<span>Decoration, illustrations, large backgrounds or body text.</span></li>' +
-            '<li class="no">' + I.x + '<span>Standing in for success, warning or danger — those are their own colours.</span></li>' +
+            '<li class="no">' + I.x + '<span>Relying on tone alone for success, warning or danger — pair those with an icon and a label.</span></li>' +
           '</ul>' +
         '</div>' +
       '</article>');
 
     accent += group("Accent tones", D.ACCENT_SCALE.length + " solid colours",
       "The default action colour is tagged. The ratio is the contrast of the label colour on that solid colour.",
-      scaleStrip(D.ACCENT_SCALE, "accent", { 600: "Default" }));
+      scaleStrip(D.ACCENT_SCALE, "accent", { 900: "Default" }));
 
     var inUse = group("Accent in use", D.ACCENT_USES.length + " roles",
       "The same black doing different jobs. Each job is its own reusable variable.",
