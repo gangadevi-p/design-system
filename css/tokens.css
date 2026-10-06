@@ -35,13 +35,13 @@
   --neutral-1000:#000000;
 
   /* ---------- status: greys only, told apart by icon and label rather than hue ---------- */
-  --success-600:#404040;
+  --success-600:#262626;
   --success-400:#d1d1d1;
-  --warning-600:#737373;
+  --warning-600:#525252;
   --warning-400:#a3a3a3;
-  --danger-800:#262626;
-  --danger-700:#404040;
-  --danger-600:#525252;
+  --danger-800:#0a0a0a;
+  --danger-700:#262626;
+  --danger-600:#404040;
   --danger-400:#a3a3a3;
   --danger-300:#d1d1d1;
   --danger-200:#e5e5e5;
@@ -145,20 +145,20 @@
 [data-theme="light"]{
   color-scheme:light;
 
-  --bg:var(--neutral-100);
+  --bg:var(--neutral-200);
   --nav-bg:#ffffff;
   --surface:var(--neutral-0);
   --surface-sunken:var(--neutral-100);
   --surface-hover:var(--neutral-200);
   --surface-pressed:var(--neutral-300);
 
-  --text:var(--neutral-900);
-  --text-secondary:var(--neutral-600);
-  --text-tertiary:var(--neutral-500);
+  --text:var(--neutral-950);
+  --text-secondary:var(--neutral-700);
+  --text-tertiary:var(--neutral-600);
   --on-accent:var(--neutral-0);
 
-  --border:rgba(0,0,0,.12);
-  --border-strong:rgba(0,0,0,.24);
+  --border:rgba(0,0,0,.20);
+  --border-strong:rgba(0,0,0,.46);
   --grid-line:rgba(0,0,0,.045);
 
   --accent:var(--accent-900);
@@ -208,13 +208,13 @@
     --surface-hover:var(--neutral-800);
     --surface-pressed:var(--neutral-700);
 
-    --text:var(--neutral-100);
+    --text:var(--neutral-50);
     --text-secondary:var(--neutral-300);
     --text-tertiary:var(--neutral-400);
     --on-accent:var(--neutral-1000);
 
-    --border:rgba(255,255,255,.10);
-    --border-strong:rgba(255,255,255,.22);
+    --border:rgba(255,255,255,.18);
+    --border-strong:rgba(255,255,255,.42);
     --grid-line:rgba(255,255,255,.035);
 
     --accent:var(--accent-100);
@@ -261,13 +261,13 @@
   --surface-hover:var(--neutral-800);
   --surface-pressed:var(--neutral-700);
 
-  --text:var(--neutral-100);
+  --text:var(--neutral-50);
   --text-secondary:var(--neutral-300);
   --text-tertiary:var(--neutral-400);
   --on-accent:var(--neutral-1000);
 
-  --border:rgba(255,255,255,.10);
-  --border-strong:rgba(255,255,255,.22);
+  --border:rgba(255,255,255,.18);
+  --border-strong:rgba(255,255,255,.42);
   --grid-line:rgba(255,255,255,.035);
 
   --accent:var(--accent-100);

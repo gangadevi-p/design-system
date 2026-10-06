@@ -149,27 +149,27 @@
   ];
 
   var STATUS = [
-    { name: "Success", light: "#404040", dark: "#D1D1D1", badge: "success", icon: "checkCircle",
+    { name: "Success", light: "#262626", dark: "#D1D1D1", badge: "success", icon: "checkCircle",
       use: "Completed actions, valid input, positive change. Told apart by its icon and label, since the palette has no hue." },
-    { name: "Warning", light: "#737373", dark: "#A3A3A3", badge: "warning", icon: "alertTriangle",
+    { name: "Warning", light: "#525252", dark: "#A3A3A3", badge: "warning", icon: "alertTriangle",
       use: "Needs attention soon. Nothing is broken yet." },
-    { name: "Danger", light: "#525252", dark: "#A3A3A3", badge: "danger", icon: "alertCircle",
+    { name: "Danger", light: "#404040", dark: "#A3A3A3", badge: "danger", icon: "alertCircle",
       use: "Errors, failed states and destructive actions." }
   ];
 
   // [label, css colour] per mode
   var COLOR_VARIABLES = [
-    { name: "bg/page", light: ["Pale gray", "#F3F3F3"], dark: ["Near black", "#0A0A0A"], use: "Page background" },
+    { name: "bg/page", light: ["Light gray", "#E5E5E5"], dark: ["Near black", "#0A0A0A"], use: "Page background" },
     { name: "bg/surface", light: ["White", "#FFFFFF"], dark: ["Ink", "#171717"], use: "Cards, inputs, menus" },
     { name: "bg/sunken", light: ["Pale gray", "#F3F3F3"], dark: ["Black", "#000000"], use: "Wells and tracks inside a surface" },
     { name: "bg/hover", light: ["Light gray", "#E5E5E5"], dark: ["Deep charcoal", "#262626"], use: "Hover fill on neutral controls" },
     { name: "bg/pressed", light: ["Soft gray", "#D1D1D1"], dark: ["Charcoal", "#404040"], use: "Pressed fill on neutral controls" },
-    { name: "text/primary", light: ["Ink", "#171717"], dark: ["Pale gray", "#F3F3F3"], use: "Headings and body" },
-    { name: "text/secondary", light: ["Dark gray", "#525252"], dark: ["Soft gray", "#D1D1D1"], use: "Supporting text" },
-    { name: "text/tertiary", light: ["Gray", "#737373"], dark: ["Mid gray", "#A3A3A3"], use: "Captions and placeholders" },
+    { name: "text/primary", light: ["Near black", "#0A0A0A"], dark: ["Cloud", "#FAFAFA"], use: "Headings and body" },
+    { name: "text/secondary", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Supporting text" },
+    { name: "text/tertiary", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Captions and placeholders" },
     { name: "text/on-accent", light: ["White", "#FFFFFF"], dark: ["Black", "#000000"], use: "Text on accent fills" },
-    { name: "border/default", light: ["Black · 12% opacity", "rgba(0,0,0,.12)"], dark: ["White · 10% opacity", "rgba(255,255,255,.10)"], use: "Card edges and dividers" },
-    { name: "border/strong", light: ["Black · 24% opacity", "rgba(0,0,0,.24)"], dark: ["White · 22% opacity", "rgba(255,255,255,.22)"], use: "Input and button outlines" },
+    { name: "border/default", light: ["Black · 20% opacity", "rgba(0,0,0,.20)"], dark: ["White · 18% opacity", "rgba(255,255,255,.18)"], use: "Card edges and dividers" },
+    { name: "border/strong", light: ["Black · 46% opacity", "rgba(0,0,0,.46)"], dark: ["White · 42% opacity", "rgba(255,255,255,.42)"], use: "Input and button outlines" },
     { name: "accent/default", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "The primary action" },
     { name: "accent/hover", light: ["Mono 800", "#262626"], dark: ["White", "#FFFFFF"], use: "Action while hovered" },
     { name: "accent/pressed", light: ["Mono 950", "#0A0A0A"], dark: ["Mono 300", "#D1D1D1"], use: "Action while pressed" },
@@ -177,10 +177,10 @@
     { name: "accent/tint-strong", light: ["Mono 300", "#D1D1D1"], dark: ["White · 24% opacity", "rgba(255,255,255,.24)"], use: "Pressed selected backgrounds" },
     { name: "accent/text", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "Links and action labels" },
     { name: "focus/ring", light: ["Mono 900", "#171717"], dark: ["Mono 300", "#D1D1D1"], use: "Keyboard focus outline" },
-    { name: "status/success", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Success text, icons and fills — paired with a check icon" },
-    { name: "status/warning", light: ["Gray", "#737373"], dark: ["Mid gray", "#A3A3A3"], use: "Warning text, icons and fills — paired with a warning icon" },
-    { name: "status/danger", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Error text, icons and danger buttons" },
-    { name: "status/danger-hover", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Danger button while hovered" },
+    { name: "status/success", light: ["Deep charcoal", "#262626"], dark: ["Soft gray", "#D1D1D1"], use: "Success text, icons and fills — paired with a check icon" },
+    { name: "status/warning", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Warning text, icons and fills — paired with a warning icon" },
+    { name: "status/danger", light: ["Charcoal", "#404040"], dark: ["Mid gray", "#A3A3A3"], use: "Error text, icons and danger buttons" },
+    { name: "status/danger-hover", light: ["Deep charcoal", "#262626"], dark: ["Soft gray", "#D1D1D1"], use: "Danger button while hovered" },
     { name: "state/disabled-bg", light: ["Light gray", "#E5E5E5"], dark: ["Deep charcoal", "#262626"], use: "Disabled fills" },
     { name: "state/disabled-text", light: ["Mid gray", "#A3A3A3"], dark: ["Dark gray", "#525252"], use: "Disabled text and icons" },
     { name: "inverse/surface", light: ["Ink", "#171717"], dark: ["Pale gray", "#F3F3F3"], use: "Toasts and tooltips" },

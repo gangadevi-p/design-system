@@ -36,6 +36,17 @@
     return bar && bar.offsetHeight ? bar.offsetHeight + 16 : 24;
   }
 
+  /* After a filter changes, keep the reader oriented. Leave the page where it is when the filter bar is
+     comfortably on screen; only if it was left out of view, bring the page title and the bar back together. */
+  function revealFilters(selector) {
+    var bar = document.querySelector(selector);
+    if (!bar) return;
+    var top = bar.getBoundingClientRect().top;
+    if (top >= scrollOffset() && top <= window.innerHeight * 0.6) return;
+    var head = bar.closest(".page").querySelector(".page-head");
+    window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
+  }
+
   function setNavOpen(open) {
     document.documentElement.classList.toggle("is-nav-open", open);
     $("menu-trigger").setAttribute("aria-expanded", open ? "true" : "false");
@@ -182,6 +193,9 @@
       if (l.getAttribute("data-section") === id) { l.setAttribute("aria-current", "page"); }
       else { l.removeAttribute("aria-current"); }
     });
+    var name = D.SECTIONS.filter(function (s) { return s.id === id; })[0].name;
+    $("menubar-page").textContent = name;
+    document.title = name + " · Design System";
     if (location.hash !== "#" + id) { history.replaceState(null, "", "#" + id); }
     try { localStorage.setItem("designSystemSection", id); } catch (err) {}
     applyFilter();
@@ -1485,7 +1499,7 @@
     if (typographyFilterBtn) {
       typographyFilter = typographyFilterBtn.getAttribute("data-typography-filter");
       applyTypographyFilter();
-      window.scrollTo({ top: document.querySelector(".typography-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
+      revealFilters(".typography-filters");
       return;
     }
 
@@ -1493,7 +1507,7 @@
     if (colorFilterBtn) {
       colorFilter = colorFilterBtn.getAttribute("data-color-filter");
       applyColorFilter();
-      window.scrollTo({ top: document.querySelector(".color-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
+      revealFilters(".color-filters");
       return;
     }
 
@@ -1509,7 +1523,7 @@
     if (variableFilterBtn) {
       variableFilter = variableFilterBtn.getAttribute("data-variable-filter");
       applyVariableFilter();
-      window.scrollTo({ top: document.querySelector(".variable-filters").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
+      revealFilters(".variable-filters");
       return;
     }
 
@@ -1523,7 +1537,7 @@
         family.hidden = filter !== "all" && family.id !== "components-" + filter;
       });
       if (searchInput) { searchInput.value = ""; applyFilter(); }
-      window.scrollTo({ top: document.querySelector(".component-jumps").getBoundingClientRect().top + window.scrollY - scrollOffset(), behavior: "smooth" });
+      revealFilters(".component-jumps");
       return;
     }
 

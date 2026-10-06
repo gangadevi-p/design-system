@@ -4,7 +4,9 @@
   "private": true,
   "description": "A Figma-ready design system reference for foundations, buttons and components.",
   "scripts": {
-    "dev": "npx --yes serve . -l 4321"
+    "dev": "npx --yes serve . -l 4321",
+    "stamp": "node scripts/version-assets.js",
+    "stamp:check": "node scripts/version-assets.js --check"
   },
   "keywords": [
     "design-system",
