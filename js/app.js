@@ -54,6 +54,29 @@
     }).join("") + '</nav>';
   }
 
+  /* Pages made of several groups get the same bar: each family is one or more groups behind one button. */
+  var pageFilters = {};
+
+  function familyPage(page, label, families) {
+    var selected = pageFilters[page] || "all";
+    $("body-" + page).innerHTML = filterBar("page-filters", label, "data-page-filter",
+      [{ id: "all", name: "All" }].concat(families), selected) +
+      families.map(function (family) {
+        return '<div class="page-family" data-page-family="' + family.id + '">' + family.content + '</div>';
+      }).join("");
+    applyPageFilter($("page-" + page));
+  }
+
+  function applyPageFilter(page) {
+    var selected = pageFilters[page.id] || "all";
+    page.querySelectorAll("[data-page-filter]").forEach(function (button) {
+      button.setAttribute("aria-pressed", button.getAttribute("data-page-filter") === selected ? "true" : "false");
+    });
+    page.querySelectorAll("[data-page-family]").forEach(function (family) {
+      family.hidden = selected !== "all" && family.getAttribute("data-page-family") !== selected;
+    });
+  }
+
   function setNavOpen(open) {
     document.documentElement.classList.toggle("is-nav-open", open);
     $("menu-trigger").setAttribute("aria-expanded", open ? "true" : "false");
@@ -486,11 +509,15 @@
     var attention = [["Bounce", "bounce"], ["Shake", "shake"], ["Rotate", "rotate"], ["Pulse", "pulse"]];
     var loops = [["Loading", "loading"], ["Shimmer", "shimmer"]];
     var effects = [["Ripple", "ripple"], ["Glow", "glow"], ["Float", "float"], ["Morph", "morph"], ["Blur", "blur"]];
-    $("body-animations").innerHTML =
-      group("Entrance", null, null, '<div class="motion-grid">' + entrances.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>') +
-      group("Attention", null, null, '<div class="motion-grid">' + attention.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>') +
-      group("Loading", null, null, '<div class="motion-grid">' + loops.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>') +
-      group("Effects", null, null, '<div class="motion-grid">' + effects.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>');
+    function motionGroup(title, list) {
+      return group(title, null, null, '<div class="motion-grid">' + list.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>');
+    }
+    familyPage("animations", "Animation filters", [
+      { id: "entrance", name: "Entrance", content: motionGroup("Entrance", entrances) },
+      { id: "attention", name: "Attention", content: motionGroup("Attention", attention) },
+      { id: "loading", name: "Loading", content: motionGroup("Loading", loops) },
+      { id: "effects", name: "Effects", content: motionGroup("Effects", effects) }
+    ]);
   }
 
   /* ================= PRINCIPLES ================= */
@@ -542,11 +569,15 @@
       ["Doherty Threshold", "Fast feedback keeps people engaged. Aim for responses within about 400 ms.", lawVisual("response", "07")],
       ["Peak-End Rule", "People remember the high point and ending. Design key moments and completion well.", lawVisual("peak", "08")]
     ];
-    $("body-principles").innerHTML =
-      group("UX", null, null, '<div class="principles-grid">' + ux.map(function (item) { return principleCard(item[0], item[1], item[2]); }).join("") + '</div>') +
-      group("UI", null, null, '<div class="principles-grid">' + ui.map(function (item) { return principleCard(item[0], item[1], item[2]); }).join("") + '</div>') +
-      group("Product", null, null, '<div class="principles-grid">' + product.map(function (item) { return principleCard(item[0], item[1], item[2]); }).join("") + '</div>') +
-      group("Laws", null, null, '<div class="principles-grid">' + laws.map(function (item) { return principleCard(item[0], item[1], item[2], true); }).join("") + '</div>');
+    function principleGroup(title, list, isLaw) {
+      return group(title, null, null, '<div class="principles-grid">' + list.map(function (item) { return principleCard(item[0], item[1], item[2], isLaw); }).join("") + '</div>');
+    }
+    familyPage("principles", "Principle filters", [
+      { id: "ux", name: "UX", content: principleGroup("UX", ux) },
+      { id: "ui", name: "UI", content: principleGroup("UI", ui) },
+      { id: "product", name: "Product", content: principleGroup("Product", product) },
+      { id: "laws", name: "Laws", content: principleGroup("Laws", laws, true) }
+    ]);
   }
 
   function applyColorFilter() {
@@ -662,7 +693,7 @@
 
   /* ================= BUTTONS ================= */
   function renderButtons() {
-    var html = group("States", D.BUTTON_VARIANTS.length + " variants × " + D.BUTTON_STATES.length + " states",
+    var statesHtml = group("States", D.BUTTON_VARIANTS.length + " variants × " + D.BUTTON_STATES.length + " states",
       "Every variant in every state. Selected is for toggles and button groups.",
       '<article class="card card--pad"><div class="table-scroll"><table class="table matrix">' +
         '<thead><tr><th>Variant</th>' + D.BUTTON_STATES.map(function (s) { return '<th>' + s.name + '</th>'; }).join("") + '</tr></thead><tbody>' +
@@ -676,14 +707,14 @@
         }).join("") +
       '</tbody></table></div></article>');
 
-    html += group("State rules", null, "What changes in each state, and how fast.",
+    var stateRulesHtml = group("State rules", null, "What changes in each state, and how fast.",
       '<div class="state-rules">' + D.STATE_RULES.map(function (r) {
         return '<article class="card rule-card" data-name="' + key([r.name, "state rule", r.rule]) + '">' +
           '<div class="principle-head"><h3 class="doc-title">' + r.name + '</h3><span class="rule-timing">' + r.timing + '</span></div>' +
           '<p class="doc-text">' + r.rule + '</p></article>';
       }).join("") + '</div>');
 
-    html += group("Variants", D.BUTTON_VARIANTS.length + " variants", "Pick by importance, not by colour.",
+    var variantsHtml = group("Variants", D.BUTTON_VARIANTS.length + " variants", "Pick by importance, not by colour.",
       '<div class="grid grid--3">' + D.BUTTON_VARIANTS.map(function (v) {
         return '<article class="card" data-name="' + key([v.name, "variant", v.use]) + '">' +
           '<div class="doc-demo">' +
@@ -697,7 +728,7 @@
         '</article>';
       }).join("") + '</div>');
 
-    html += group("Sizes", D.BUTTON_SIZES.length + " sizes", "Label sizes follow the platform type styles, so buttons read the same on web and mobile.",
+    var sizesHtml = group("Sizes", D.BUTTON_SIZES.length + " sizes", "Label sizes follow the platform type styles, so buttons read the same on web and mobile.",
       '<div class="grid grid--3">' + D.BUTTON_SIZES.map(function (s) {
         var c = s.cls ? " " + s.cls : "";
         return '<article class="card" data-name="' + key([s.name, "size", s.height, s.use]) + '">' +
@@ -714,7 +745,7 @@
         '</article>';
       }).join("") + '</div>');
 
-    html += group("Anatomy", D.ANATOMY.length + " parts", null,
+    var anatomyHtml = group("Anatomy", D.ANATOMY.length + " parts", null,
       '<article class="card anatomy" data-name="anatomy parts container icon label focus ring">' +
         '<div class="anatomy-stage">' +
           '<button class="btn btn--primary btn--lg is-focus" type="button" tabindex="-1">' +
@@ -756,7 +787,7 @@
         demo: '<button class="btn btn--primary is-loading" type="button" aria-busy="true" disabled>' + I.download + 'Export</button>' }
     ];
 
-    html += group("Icons & layout", patterns.length + " patterns", null,
+    var layoutHtml = group("Icons & layout", patterns.length + " patterns", null,
       '<div class="grid grid--3">' + patterns.map(function (p) {
         return '<article class="card" data-name="' + key([p.name, "pattern", p.text]) + '">' +
           '<div class="doc-demo">' + p.demo + '</div>' +
@@ -764,7 +795,13 @@
         '</article>';
       }).join("") + '</div>');
 
-    $("body-buttons").innerHTML = html;
+    familyPage("buttons", "Button filters", [
+      { id: "states", name: "States", content: statesHtml + stateRulesHtml },
+      { id: "variants", name: "Variants", content: variantsHtml },
+      { id: "sizes", name: "Sizes", content: sizesHtml },
+      { id: "anatomy", name: "Anatomy", content: anatomyHtml },
+      { id: "layout", name: "Layout", content: layoutHtml }
+    ]);
   }
 
   /* ================= COMPONENTS ================= */
@@ -1223,7 +1260,7 @@
         '<span>Found something worth keeping? Add it from <em>Save here</em> in the sidebar.</span>' +
         '<button class="btn btn--primary btn--sm" type="button" data-saved-add>' + I.plus + 'Save here</button></div>';
     } else {
-      html = '<div class="saved-bar"><nav class="saved-filters" aria-label="Saved filters">' +
+      html = '<div class="saved-bar"><nav class="filter-bar saved-filters" aria-label="Saved filters">' +
         ['all'].concat(tabs).map(function (f) {
           var n = f === "all" ? saved.length : countIn(f);
           return '<button type="button" data-saved-filter="' + esc(f) + '" aria-pressed="' + (f === savedFilter) + '">' +
@@ -1533,6 +1570,15 @@
       variableFilter = variableFilterBtn.getAttribute("data-variable-filter");
       applyVariableFilter();
       revealFilters(".variable-filters");
+      return;
+    }
+
+    var pageFilterBtn = t.closest("[data-page-filter]");
+    if (pageFilterBtn) {
+      var filterPage = pageFilterBtn.closest(".page");
+      pageFilters[filterPage.id] = pageFilterBtn.getAttribute("data-page-filter");
+      applyPageFilter(filterPage);
+      revealFilters("#" + filterPage.id + " .page-filters");
       return;
     }
 

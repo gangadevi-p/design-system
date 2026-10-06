@@ -137,13 +137,9 @@ body{background:var(--bg);}
 /* ---------- saved page ---------- */
 .saved-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:44px;}
 .saved-bar .btn{flex:none;}
-.saved-filters{display:flex;flex:1 1 320px;flex-wrap:wrap;gap:12px;}
+.saved-bar .saved-filters{flex:0 1 auto;min-width:0;margin-bottom:0;}
 .saved-empty .btn{margin-top:6px;}
 .save-form .field[hidden]{display:none;}
-.saved-filters button{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-full);background:var(--surface);color:var(--text-secondary);font:inherit;font-size:var(--caption-size);cursor:pointer;}
-.saved-filters button:hover{background:var(--accent-tint);color:var(--accent-text);border-color:var(--accent);}
-.saved-filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:var(--weight-semibold);}
-.saved-filters button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px;}
 .saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:30px;}
 .saved-card{padding:24px;gap:14px;}
 .saved-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -228,7 +224,6 @@ body{background:var(--bg);}
 @media (max-width:960px){
   .menu-trigger,.back-trigger,.sidebar-close{width:var(--touch-min);height:var(--touch-min);}
   .search,.search-trigger,.search input,.save-toggle,.nav-link{height:var(--touch-min);}
-  .saved-filters button{min-height:var(--touch-min);}
   .filter-bar button{height:var(--touch-min);}
   .saved-bar .btn{height:var(--touch-min);}
   .saved-card .saved-card-actions{margin:-8px -10px -8px 0;}
@@ -612,12 +607,12 @@ body{background:var(--bg);}
 @keyframes motion-blur{from{filter:blur(0);opacity:1}to{filter:blur(8px);opacity:.3}}
 @keyframes motion-shimmer{from{background-position:200% 0}to{background-position:-100% 0}}
 @media (prefers-reduced-motion:reduce){.motion-object{animation:none !important;}}
-/* One filter control for every page: an iOS-style segmented bar, scrolls sideways instead of wrapping. */
-.filter-bar{display:flex;width:max-content;max-width:100%;gap:2px;padding:3px;margin-bottom:44px;border-radius:var(--radius-md);background:var(--surface-hover);overflow-x:auto;scrollbar-width:none;}
+/* One filter control for every page: a white pill bar, scrolls sideways instead of wrapping. */
+.filter-bar{display:flex;width:max-content;max-width:100%;gap:2px;padding:4px;margin-bottom:44px;border:1px solid var(--border);border-radius:var(--radius-full);background:var(--surface);overflow-x:auto;scrollbar-width:none;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-bar button{flex:none;height:32px;padding:0 16px;border:0;border-radius:calc(var(--radius-md) - 2px);background:transparent;color:var(--text-secondary);font:inherit;font-size:var(--caption-size);font-weight:var(--weight-semibold);white-space:nowrap;cursor:pointer;transition:background .15s ease,color .15s ease;}
+.filter-bar button{flex:none;height:32px;padding:0 16px;border:0;border-radius:var(--radius-full);background:var(--surface);color:var(--text-secondary);font:inherit;font-size:var(--caption-size);font-weight:var(--weight-semibold);white-space:nowrap;cursor:pointer;transition:background .15s ease,color .15s ease;}
 .filter-bar button:hover{color:var(--text);}
-.filter-bar button[aria-pressed="true"]{background:var(--surface);color:var(--text);}
+.filter-bar button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
 .filter-bar button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:1px;}
 @media (prefers-reduced-motion:reduce){.filter-bar button{transition:none;}}
 .component-family{scroll-margin-top:24px;margin-bottom:48px;gap:28px;}
